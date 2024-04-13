@@ -9,11 +9,10 @@ contract StoryInspiration {
 	mapping(address => uint256) public inspirationIndex;
 	mapping(address => bool) public hasSubmitted;
 
-	event InspirationSubmission(address indexed submitter, string inspiration);
-	event InspirationReplacement(
+	event InspirationSubmission(
 		address indexed submitter,
-		string oldInspiration,
-		string newInspiration
+		string inspiration,
+		string story
 	);
 
 	function submitOrReplaceInspiration(string memory _inspiration) public {
@@ -25,11 +24,7 @@ contract StoryInspiration {
 				msg.sender
 			);
 			inspirations[index] = _inspiration;
-			emit InspirationReplacement(
-				msg.sender,
-				inspirations[index],
-				_inspiration
-			);
+			emit InspirationSubmission(msg.sender, _inspiration, getStory());
 		} else {
 			console.log(
 				"Submitting new inspiration '%s' from %s",
@@ -39,7 +34,7 @@ contract StoryInspiration {
 			inspirations.push(_inspiration);
 			inspirationIndex[msg.sender] = inspirations.length - 1;
 			hasSubmitted[msg.sender] = true;
-			emit InspirationSubmission(msg.sender, _inspiration);
+			emit InspirationSubmission(msg.sender, _inspiration, getStory());
 		}
 	}
 

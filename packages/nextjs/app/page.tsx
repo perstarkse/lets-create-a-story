@@ -6,24 +6,36 @@ import { useAccount } from "wagmi";
 // import { BugAntIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import Story from "~~/components/Story";
 import { Address } from "~~/components/scaffold-eth";
-import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
+import { useScaffoldEventHistory } from "~~/hooks/scaffold-eth";
 
 const Home: NextPage = () => {
   const { address: connectedAddress } = useAccount();
   const [savedStory, setStory] = useState<string>("");
 
-  const { data: story, isLoading } = useScaffoldContractRead({
+  const { data: storyEvents, isLoading } = useScaffoldEventHistory({
     contractName: "StoryInspiration",
-    functionName: "getStory",
+    eventName: "InspirationSubmission",
+    fromBlock: 0n,
   });
 
+  console.log("storyEvents", storyEvents);
+
+  const latestInspirationSubmission = {
+    story: storyEvents?.length ? storyEvents[0]?.args?.story : "",
+    // @ts-ignore
+    timestamp: storyEvents?.length && storyEvents[0].block ? Number(storyEvents[0].block.timestamp) : 0,
+  };
+
+  console.log("latestInspirationSubmission", latestInspirationSubmission);
+
   const generateStoryBackend = async () => {
+    console.log("latestInspirationSubmission", latestInspirationSubmission);
     const response = await fetch("/api/generateStory", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ story }),
+      body: JSON.stringify(latestInspirationSubmission),
     });
     return await response.json();
   };
@@ -32,6 +44,51 @@ const Home: NextPage = () => {
     if (isLoading) return;
     const result = await generateStoryBackend();
     setStory(result.story);
+  };
+
+  const getStoryFromBackend = async (timestamp: string) => {
+    try {
+      const response = await fetch(`/api/getStory?timestamp=${timestamp}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching story:", error);
+      throw error;
+    }
+  };
+
+  const getStory = async () => {
+    if (isLoading) return;
+    const result = await getStoryFromBackend(latestInspirationSubmission.timestamp.toString());
+    console.log("result", result);
+    setStory(result.generatedStory);
+    getStoryParts();
+  };
+
+  const getStoryParts = () => {
+    const parts = [
+      savedStory.slice(0, savedStory.indexOf("\n\n## ")),
+      savedStory.slice(savedStory.indexOf("\n\n## "), savedStory.indexOf("\n\n## ", savedStory.indexOf("\n\n## ") + 1)),
+      savedStory.slice(
+        savedStory.indexOf("\n\n## ", savedStory.indexOf("\n\n## ") + 1),
+        savedStory.indexOf("\n\n## ", savedStory.indexOf("\n\n## ", savedStory.indexOf("\n\n## ") + 1) + 1),
+      ),
+      savedStory.slice(
+        savedStory.indexOf("\n\n## ", savedStory.indexOf("\n\n## ", savedStory.indexOf("\n\n## ") + 1) + 1),
+      ),
+    ];
+
+    console.log(parts);
+    return parts;
   };
 
   return (
@@ -49,6 +106,10 @@ const Home: NextPage = () => {
           <button onClick={generateStory} className="btn btn-primary">
             {" "}
             Generate Story
+          </button>
+          <button onClick={getStory} className="btn btn-primary">
+            {" "}
+            Get Story
           </button>
           <Story story={savedStory.length ? savedStory : ""} />
           {/* <p className="text-center text-lg">{savedStory.length ? savedStory : ""}</p> */}

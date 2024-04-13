@@ -1,3 +1,6 @@
+// static by default, unless reading the request
+import { kv } from "@vercel/kv";
+
 export const dynamic = "force-dynamic"; // static by default, unless reading the request
 
 const getPrompt = (story: string) => {
@@ -19,9 +22,9 @@ const getPrompt = (story: string) => {
 
 export async function POST(request: Request) {
   try {
-    const { story } = await request.json();
+    const { story, timestamp } = await request.json();
     if (!story) return;
-    console.log("getting story from ai");
+    console.log("getting story from ai at timestamp", timestamp);
     const result = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -35,6 +38,12 @@ export async function POST(request: Request) {
     });
 
     const data = await result.json();
+
+    await kv.hset(timestamp, {
+      timestamp: timestamp,
+      generatedStory: data.choices[0].message.content,
+      submittedStory: story,
+    });
 
     return new Response(JSON.stringify({ story: data.choices[0].message.content }), {
       status: 200,
