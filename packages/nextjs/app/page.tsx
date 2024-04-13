@@ -87,7 +87,7 @@ const Home: NextPage = () => {
       ),
     ];
 
-    console.log(parts);
+    // console.log(parts);
     return parts;
   };
 
@@ -111,7 +111,7 @@ const Home: NextPage = () => {
             {" "}
             Get Story
           </button>
-          <Story story={savedStory.length ? savedStory : ""} />
+          <Story storyArray={savedStory.length ? getStoryParts() : []} />
           {/* <p className="text-center text-lg">{savedStory.length ? savedStory : ""}</p> */}
         </div>
       </div>
