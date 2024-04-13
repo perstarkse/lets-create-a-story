@@ -58,7 +58,7 @@ export default function Story({ storyArray }: any) {
         </div>
       ))}
 
-      <div className="btn-group">
+      <div className="btn-group justify-center flex">
         {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
           <button
             key={page}

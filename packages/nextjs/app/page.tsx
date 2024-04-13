@@ -11,6 +11,7 @@ import { useScaffoldEventHistory } from "~~/hooks/scaffold-eth";
 const Home: NextPage = () => {
   const { address: connectedAddress } = useAccount();
   const [savedStory, setStory] = useState<string>("");
+  const [coverimage, setCoverImage] = useState<string>("");
 
   const { data: storyEvents, isLoading } = useScaffoldEventHistory({
     contractName: "StoryInspiration",
@@ -71,6 +72,7 @@ const Home: NextPage = () => {
     const result = await getStoryFromBackend(latestInspirationSubmission.timestamp.toString());
     console.log("result", result);
     setStory(result.generatedStory);
+    setCoverImage(result.image);
     getStoryParts();
   };
 
@@ -111,6 +113,9 @@ const Home: NextPage = () => {
             {" "}
             Get Story
           </button>
+          <div className="my-4">
+            {coverimage ? <img src={coverimage} alt="Cover" className="w-full rounded-lg" /> : ""}
+          </div>
           <Story storyArray={savedStory.length ? getStoryParts() : []} />
           {/* <p className="text-center text-lg">{savedStory.length ? savedStory : ""}</p> */}
         </div>
