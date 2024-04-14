@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import ContributeToStory from "./ContributeToStory";
 import Markdown from "react-markdown";
 
-export default function Story({ chapters }: { chapters: { chapter: number; content: string }[] }) {
+export default function Chapters({ chapters }: { chapters: { chapter: number; content: string }[] }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [showContributeSection, setShowContributeSection] = useState(false);
   const itemsPerPage = 1;

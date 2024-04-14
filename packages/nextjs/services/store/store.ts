@@ -1,5 +1,6 @@
 import create from "zustand";
 import scaffoldConfig from "~~/scaffold.config";
+import { StoryData } from "~~/types/story";
 import { ChainWithAttributes } from "~~/utils/scaffold-eth";
 
 /**
@@ -16,6 +17,10 @@ type GlobalState = {
   setNativeCurrencyPrice: (newNativeCurrencyPriceState: number) => void;
   targetNetwork: ChainWithAttributes;
   setTargetNetwork: (newTargetNetwork: ChainWithAttributes) => void;
+  eventHistory: any | null;
+  setEventHistory: (newEventHistory: any) => void;
+  storyData: StoryData | null;
+  setStoryData: (newStoryData: StoryData) => void;
 };
 
 export const useGlobalState = create<GlobalState>(set => ({
@@ -23,4 +28,8 @@ export const useGlobalState = create<GlobalState>(set => ({
   setNativeCurrencyPrice: (newValue: number): void => set(() => ({ nativeCurrencyPrice: newValue })),
   targetNetwork: scaffoldConfig.targetNetworks[0],
   setTargetNetwork: (newTargetNetwork: ChainWithAttributes) => set(() => ({ targetNetwork: newTargetNetwork })),
+  eventHistory: null,
+  setEventHistory: (newEventHistory: any) => set(() => ({ eventHistory: newEventHistory })),
+  storyData: null,
+  setStoryData: (newStoryData: StoryData) => set(() => ({ storyData: newStoryData })),
 }));

@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect } from "react";
-import Link from "next/link";
+import { useEffect, useState } from "react";
 import type { NextPage } from "next";
+// import { useAccount } from "wagmi";
 // import { BugAntIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import Chapters from "~~/components/Chapters";
+// import { Address } from "~~/components/scaffold-eth";
 import { useScaffoldEventHistory } from "~~/hooks/scaffold-eth";
 import { useGlobalState } from "~~/services/store/store";
 import { getStoryFromBackend } from "~~/utils/api";
 
-const Home: NextPage = () => {
+const Story: NextPage = () => {
+  const [coverimage, setCoverImage] = useState<string>("");
   const { data: contractEvents, isLoading } = useScaffoldEventHistory({
     contractName: "StoryInspiration",
     eventName: "InspirationSubmission",
@@ -41,46 +44,45 @@ const Home: NextPage = () => {
           result = await getStoryFromBackend(secondToLastSubmission.timestamp.toString());
         }
         if (result) setStoryData(result);
-        console.log("storyData", storyData);
-        console.log("result", eventHistory);
       };
 
       getStory();
     }
-  }, [isLoading, eventHistory, storyData, contractEvents, setEventHistory, setStoryData]);
+  }, [isLoading, contractEvents, eventHistory, storyData, setEventHistory, setStoryData]);
+
+  useEffect(() => {
+    if (storyData?.image && !coverimage) {
+      setCoverImage(storyData.image);
+    }
+  }, [storyData, coverimage]);
+
+  if (!storyData) {
+    return <></>;
+  }
 
   return (
     <>
-      <div className="hero flex-grow pt-10 max-w-5xl mx-auto text-center">
+      <div className="flex items-center flex-col flex-grow pt-10 max-w-5xl mx-auto">
         <div className="px-5">
-          <h1 className="text-4xl font-bold">Let&apos;s Create A Story Together</h1>
-          <p className="text-lg ">
-            This is a shared storytelling experience where users can submit inspiration and the AI will generate a story
-            for us. It is an ever changing experience.
-          </p>
-          <div className="flex justify-center gap-2">
-            <Link passHref href="/story">
-              <button className="btn btn-primary mt-4">The Story</button>
-            </Link>
-            <Link passHref href="/timeline">
-              <button className="btn btn-primary mt-4">Timeline</button>
-            </Link>
-            <Link passHref href="/contribute">
-              <button className="btn btn-primary mt-4">Contribute</button>
-            </Link>
-          </div>
-
           <div className="flex justify-center">
-            <p className="text-sm text-gray-600 mt-4">
-              {storyData?.generatedStory
-                ? `Last story generated: ${storyData.generatedStory.title} - ${storyData.generatedStory.subtitle}`
-                : "Loading..."}
-            </p>
+            {/* <button onClick={generateStory} className="btn btn-primary">
+              {" "}
+              Generate Story
+            </button> */}
           </div>
+          <h1 className="text-4xl pt-4 text-center font-serif font-bold">{storyData?.generatedStory.title}</h1>
+          <h2 className="text-2xl py-2 text-center italic font-serif font-bold">
+            {storyData?.generatedStory.subtitle}
+          </h2>
+          <div className="mt-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            {coverimage ? <img src={coverimage} alt="Cover" className="w-full rounded-lg" /> : ""}
+          </div>
+          <Chapters chapters={storyData?.generatedStory.chapters.length ? storyData.generatedStory.chapters : []} />
         </div>
       </div>
     </>
   );
 };
 
-export default Home;
+export default Story;
