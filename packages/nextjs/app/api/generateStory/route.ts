@@ -2,7 +2,7 @@
 import { put } from "@vercel/blob";
 import { kv } from "@vercel/kv";
 
-export const dynamic = "force-dynamic"; // static by default, unless reading the request
+export const dynamic = "force-dynamic";
 
 const getStoryPrompt = (story: string) => {
   const prompt = `
@@ -12,6 +12,16 @@ const getStoryPrompt = (story: string) => {
   Make sure you provide a full story, albeit short, 300 words. Make sure it is interesting. \
   ALWAYS Split the story into three chapters. Make sure the story contains three chapters! \
   Use markdown to format the story. \
+  THE OUTPUT SHOULD BE A JSON OBJECT WITH THE FOLLOWING FORMAT: \
+  { \
+    "title": "THE TITLE" \
+    "subtitle": "THE SUBTITLE" \
+    "chapters": [ \
+      { chapter: 1 , content:"CHAPTER 1" }, \
+      { chapter: 2 , content:"CHAPTER 2" }, \
+      { chapter: 3 , content:"CHAPTER 3" } \
+    ] \
+  } \
 
   User Inputs
   ${story}
@@ -66,7 +76,10 @@ export async function POST(request: Request) {
   try {
     const { story, timestamp } = await request.json();
     if (!story) return;
-    console.log("getting story from ai at timestamp", timestamp);
+    console.log("Getting story from timestamp", timestamp);
+
+    // GENERATE THE STORY
+
     const storyResult = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -80,8 +93,7 @@ export async function POST(request: Request) {
     });
 
     const storyData = await storyResult.json();
-
-    console.log("generation of story finished");
+    console.log("Generation of story completed");
 
     // GENERATE THE IMAGE PROMPT
 
@@ -100,15 +112,12 @@ export async function POST(request: Request) {
     const imagePromptData = await imagePromptResult.json();
     const imagePrompt = imagePromptData.choices[0].message.content;
 
-    console.log("image prompt generated");
-    console.log(imagePrompt);
+    console.log("Generation of image prompt completed");
 
     // GENERATING THE IMAGE
 
     const engineId = "stable-diffusion-v1-6";
     const apiKey = process.env.STABILITY_API_KEY;
-
-    console.log("generating image");
 
     const response = await fetch(`https://api.stability.ai/v1/generation/${engineId}/text-to-image`, {
       method: "POST",
@@ -137,7 +146,7 @@ export async function POST(request: Request) {
 
     const responseJSON = (await response.json()) as GenerationResponse;
 
-    console.log("image generated");
+    console.log("Generation of image completed");
 
     // SAVE TO BLOB AND KV
 
@@ -147,14 +156,15 @@ export async function POST(request: Request) {
       access: "public",
     });
 
-    console.log("image saved to Vercel Blob storage");
-
     await kv.hset(timestamp, {
       timestamp: timestamp,
       generatedStory: storyData.choices[0].message.content,
       submittedStory: story,
       image: blob.url,
+      imagePrompt: imagePrompt,
     });
+
+    console.log("Image and Story object saved to Vercel");
 
     return new Response(JSON.stringify({ story: storyData.choices[0].message.content }), {
       status: 200,

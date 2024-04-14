@@ -20,6 +20,18 @@ export const menuLinks: HeaderMenuLink[] = [
     href: "/",
   },
   {
+    label: "Story",
+    href: "/story",
+  },
+  {
+    label: "Timeline",
+    href: "/timeline",
+  },
+  {
+    label: "Contribute",
+    href: "/contribute",
+  },
+  {
     label: "Debug Contracts",
     href: "/debug",
     icon: <BugAntIcon className="h-4 w-4" />,

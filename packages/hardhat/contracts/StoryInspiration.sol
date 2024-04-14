@@ -1,13 +1,11 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
-// Useful for debugging. Remove when deploying to a live network.
-import "hardhat/console.sol";
-
 contract StoryInspiration {
 	string[] public inspirations;
 	mapping(address => uint256) public inspirationIndex;
 	mapping(address => bool) public hasSubmitted;
+	uint256 public inspirationCount;
 
 	event InspirationSubmission(
 		address indexed submitter,
@@ -18,19 +16,10 @@ contract StoryInspiration {
 	function submitOrReplaceInspiration(string memory _inspiration) public {
 		uint256 index = inspirationIndex[msg.sender];
 		if (hasSubmitted[msg.sender]) {
-			console.log(
-				"Replacing inspiration '%s' from %s",
-				inspirations[index],
-				msg.sender
-			);
 			inspirations[index] = _inspiration;
 			emit InspirationSubmission(msg.sender, _inspiration, getStory());
 		} else {
-			console.log(
-				"Submitting new inspiration '%s' from %s",
-				_inspiration,
-				msg.sender
-			);
+			inspirationCount++;
 			inspirations.push(_inspiration);
 			inspirationIndex[msg.sender] = inspirations.length - 1;
 			hasSubmitted[msg.sender] = true;

@@ -19,6 +19,15 @@ export async function GET(request: Request) {
 
     const storyData = await kv.hgetall(timestamp);
 
+    if (!storyData) {
+      return new Response(JSON.stringify({ message: "Story not found" }), {
+        status: 404,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    }
+
     return new Response(JSON.stringify(storyData), {
       status: 200,
       headers: {
