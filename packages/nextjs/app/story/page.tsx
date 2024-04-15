@@ -12,16 +12,17 @@ import { getStoryFromBackend } from "~~/utils/api";
 
 const Story: NextPage = () => {
   const [coverimage, setCoverImage] = useState<string>("");
+  const { eventHistory, setEventHistory, storyData, setStoryData } = useGlobalState();
+
   const { data: contractEvents, isLoading } = useScaffoldEventHistory({
     contractName: "StoryKeeper",
     eventName: "InspirationSubmission",
     fromBlock: 0n,
+    enabled: eventHistory,
   });
 
-  const { eventHistory, setEventHistory, storyData, setStoryData } = useGlobalState();
-
   useEffect(() => {
-    if (eventHistory || storyData) {
+    if (storyData || eventHistory) {
       return;
     }
     if (!isLoading && contractEvents?.length) {

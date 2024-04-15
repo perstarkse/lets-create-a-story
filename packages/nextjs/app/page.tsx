@@ -19,7 +19,7 @@ const Home: NextPage = () => {
   const [coverimage, setCoverImage] = useState<string>("");
 
   useEffect(() => {
-    if (eventHistory || storyData) {
+    if (storyData && eventHistory) {
       return;
     }
     if (!isLoading && contractEvents?.length) {
@@ -74,6 +74,33 @@ const Home: NextPage = () => {
             This is a shared storytelling experience where users can submit inspiration and the AI will generate a story
             for us. It is an ever changing experience.
           </p>
+          <div className="flex justify-center flex-col">
+            {storyData?.generatedStory ? (
+              <>
+                {" "}
+                <h3 className="text-xl mt-4 font-bold">The Current Story:</h3>
+                <div className="flex justify-center items-center space-x-2">
+                  <p className="text-lg">
+                    {storyData?.generatedStory ? `${storyData.generatedStory.title}` : "Loading..."}
+                  </p>
+                  <span className="text-lg">-</span>
+                  <p className="italic text-lg">
+                    {storyData?.generatedStory ? `${storyData.generatedStory.subtitle}` : "Loading..."}
+                  </p>
+                </div>
+                <div className="mt-4">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  {coverimage ? <img src={coverimage} alt="Cover" className="w-full rounded-lg" /> : ""}
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="italic">
+                  The story has not begun yet, enter your inspiration and see the story take fold
+                </p>
+              </>
+            )}
+          </div>
           <div className="flex justify-center gap-2">
             <Link passHref href="/story">
               <button className="btn btn-primary mt-4">The Story</button>
@@ -84,23 +111,6 @@ const Home: NextPage = () => {
             <Link passHref href="/contribute">
               <button className="btn btn-primary mt-4">Contribute</button>
             </Link>
-          </div>
-
-          <div className="flex justify-center flex-col">
-            <h3 className="text-xl mt-4 font-bold">The Current Story:</h3>
-            <div className="flex justify-center items-center space-x-2">
-              <p className="text-lg">
-                {storyData?.generatedStory ? `${storyData.generatedStory.title}` : "Loading..."}
-              </p>
-              <span className="text-lg">-</span>
-              <p className="italic text-lg">
-                {storyData?.generatedStory ? `${storyData.generatedStory.subtitle}` : "Loading..."}
-              </p>
-            </div>
-            <div className="mt-4">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              {coverimage ? <img src={coverimage} alt="Cover" className="w-full rounded-lg" /> : ""}
-            </div>
           </div>
         </div>
       </div>
