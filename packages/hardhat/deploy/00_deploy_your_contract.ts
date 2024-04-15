@@ -22,7 +22,7 @@ const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEn
   const { deployer } = await hre.getNamedAccounts();
   const { deploy } = hre.deployments;
 
-  await deploy("StoryInspiration", {
+  await deploy("StoryKeeper", {
     from: deployer,
     // Contract constructor arguments
     // args: [deployer],
@@ -33,7 +33,7 @@ const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEn
   });
 
   // Get the deployed contract to interact with it after deploying.
-  const inspirationContract = await hre.ethers.getContract<Contract>("StoryInspiration", deployer);
+  const inspirationContract = await hre.ethers.getContract<Contract>("StoryKeeper", deployer);
   // await inspirationContract.submitOrReplaceInspiration("There was a dragon in the forest");
   // const secondAccountInspiration = "The dragon was actually a friendly dragon";
   // const secondAccountContract = await hre.ethers.getContract<Contract>("StoryInspiration", secondAccount);

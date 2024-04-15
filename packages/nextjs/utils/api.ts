@@ -8,7 +8,7 @@ export const getStoryFromBackend = async (timestamp: string): Promise<any> => {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error ${response.status}`);
+      return response;
     }
 
     return await response.json();

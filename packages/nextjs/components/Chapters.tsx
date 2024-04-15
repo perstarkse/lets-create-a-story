@@ -23,6 +23,12 @@ export default function Chapters({ chapters }: { chapters: { chapter: number; co
   // Keyboard navigation
   useEffect(() => {
     const handleKeydown = (event: KeyboardEvent) => {
+      // Check if the currently focused element is an input field
+      const focusedElement = document.activeElement;
+      if (focusedElement instanceof HTMLInputElement) {
+        return;
+      }
+
       switch (event.key) {
         case "h":
         case "ArrowLeft":
@@ -40,6 +46,10 @@ export default function Chapters({ chapters }: { chapters: { chapter: number; co
           break;
         case "j":
         case "ArrowDown":
+          if (currentPage === totalPages) {
+            setShowContributeSection(true);
+            return;
+          }
           setCurrentPage(Math.min(currentPage + 1, totalPages));
           setShowContributeSection(false);
           break;

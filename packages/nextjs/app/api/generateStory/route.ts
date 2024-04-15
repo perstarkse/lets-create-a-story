@@ -26,7 +26,7 @@ const getStoryPrompt = (story: string) => {
   User Inputs
   ${story}
   
-  Generate the story
+  Generate the story and output the JSON object.
   `;
   return prompt;
 };
@@ -59,9 +59,20 @@ const getImagePrompt = (story: string) => {
   Story: \
   ${story}
   
-  Generate the prompt for the illustration according to instructions and only answer with the prompt.
+  Generate the prompt for the illustration according to instructions and only output the prompt itself!.
   `;
   return prompt;
+};
+
+type Chapter = {
+  chapter: number;
+  content: string;
+};
+
+type Story = {
+  title: string;
+  subtitle: string;
+  chapters: Chapter[];
 };
 
 interface GenerationResponse {
@@ -72,6 +83,34 @@ interface GenerationResponse {
   }>;
 }
 
+function isStory(
+  data: any,
+): data is { title: string; subtitle: string; chapters: { chapter: number; content: string }[] } {
+  console.log(data);
+  if (typeof data !== "object" || data === null) {
+    return false;
+  }
+
+  const { title, subtitle, chapters } = data;
+
+  if (typeof title !== "string" || typeof subtitle !== "string" || !Array.isArray(chapters)) {
+    return false;
+  }
+
+  for (const chapter of chapters) {
+    if (
+      typeof chapter !== "object" ||
+      chapter === null ||
+      typeof chapter.chapter !== "number" ||
+      typeof chapter.content !== "string"
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 export async function POST(request: Request) {
   try {
     const { story, timestamp } = await request.json();
@@ -80,19 +119,40 @@ export async function POST(request: Request) {
 
     // GENERATE THE STORY
 
-    const storyResult = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "anthropic/claude-3-haiku:beta",
-        messages: [{ role: "user", content: getStoryPrompt(story) }],
-      }),
-    });
+    let storyData: Story | null = null;
 
-    const storyData = await storyResult.json();
+    while (!storyData) {
+      const storyResult = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "anthropic/claude-3-haiku:beta",
+          messages: [{ role: "user", content: getStoryPrompt(story) }],
+        }),
+      });
+
+      const data = await storyResult.json();
+
+      try {
+        if (isStory(JSON.parse(data.choices[0].message.content))) {
+          storyData = data.choices[0].message.content;
+        } else {
+          console.error("Response is not in the expected format. Trying again...");
+        }
+      } catch (error) {
+        if (error instanceof SyntaxError) {
+          console.error(
+            "Error processing request: SyntaxError: Unexpected token in JSON at position 0. Trying again...",
+          );
+        } else {
+          console.error("Error parsing story data:", error);
+        }
+      }
+    }
+
     console.log("Generation of story completed");
 
     // GENERATE THE IMAGE PROMPT
@@ -105,7 +165,7 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify({
         model: "anthropic/claude-3-haiku:beta",
-        messages: [{ role: "user", content: getImagePrompt(storyData.choices[0].message.content) }],
+        messages: [{ role: "user", content: getImagePrompt(storyData.toString()) }],
       }),
     });
 
@@ -129,7 +189,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         text_prompts: [
           {
-            text: imagePrompt,
+            text: `Highly stylized digital artwork of (${imagePrompt}), trending on artstation, incredible vibrant colors, dynamic epic composition, foamy stylized water, ray tracing, traditional art by studio ghibli`,
           },
         ],
         cfg_scale: 7,
@@ -158,7 +218,7 @@ export async function POST(request: Request) {
 
     await kv.hset(timestamp, {
       timestamp: timestamp,
-      generatedStory: storyData.choices[0].message.content,
+      generatedStory: storyData,
       submittedStory: story,
       image: blob.url,
       imagePrompt: imagePrompt,
@@ -166,7 +226,7 @@ export async function POST(request: Request) {
 
     console.log("Image and Story object saved to Vercel");
 
-    return new Response(JSON.stringify({ story: storyData.choices[0].message.content }), {
+    return new Response(JSON.stringify({ story: storyData }), {
       status: 200,
       headers: {
         "Content-Type": "application/json",

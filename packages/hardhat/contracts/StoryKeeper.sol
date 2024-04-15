@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
-contract StoryInspiration {
+contract StoryKeeper {
 	string[] public inspirations;
 	mapping(address => uint256) public inspirationIndex;
 	mapping(address => bool) public hasSubmitted;

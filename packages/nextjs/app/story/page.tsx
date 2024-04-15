@@ -13,7 +13,7 @@ import { getStoryFromBackend } from "~~/utils/api";
 const Story: NextPage = () => {
   const [coverimage, setCoverImage] = useState<string>("");
   const { data: contractEvents, isLoading } = useScaffoldEventHistory({
-    contractName: "StoryInspiration",
+    contractName: "StoryKeeper",
     eventName: "InspirationSubmission",
     fromBlock: 0n,
   });
@@ -35,7 +35,9 @@ const Story: NextPage = () => {
 
       const getStory = async () => {
         let result = await getStoryFromBackend(latestInspirationSubmission.timestamp.toString());
-        if (!result) {
+        console.log(result);
+
+        if (result.status === 404) {
           const secondToLastSubmission = {
             story: contractEvents[1]?.args.story,
             // @ts-ignore
