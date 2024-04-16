@@ -7,7 +7,7 @@ import { Address } from "~~/components/scaffold-eth";
 import { useScaffoldEventHistory } from "~~/hooks/scaffold-eth";
 import { useGlobalState } from "~~/services/store/store";
 
-const Story: NextPage = () => {
+const Timeline: NextPage = () => {
   const { eventHistory, setEventHistory } = useGlobalState();
 
   const { data: contractEvents, isLoading } = useScaffoldEventHistory({
@@ -37,11 +37,15 @@ const Story: NextPage = () => {
                   />
                 </svg>
               </div>
-              <div className="timeline-start md:text-end mb-10">
+              <div
+                className={`timeline-${index % 2 === 0 ? "start" : "end"} md:text-${
+                  index % 2 === 0 ? "end" : "start"
+                } mb-10`}
+              >
                 <time className="font-mono italic">
                   {new Date(Number((event as any).block?.timestamp ?? 0) * 1000).toLocaleString()}
                 </time>
-                <div className="text-lg font-black flex justify-end mt-2">
+                <div className={`text-lg font-black flex mt-2 ${index % 2 === 0 ? "justify-end" : "justify-start"}`}>
                   <Address address={event.args[0]} />
                 </div>
                 <div className="italic mt-2">{event.args[1]}</div>
@@ -58,4 +62,4 @@ const Story: NextPage = () => {
   );
 };
 
-export default Story;
+export default Timeline;

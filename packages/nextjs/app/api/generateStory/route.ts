@@ -9,8 +9,9 @@ const getStoryPrompt = (story: string) => {
   Your role is to create a story using snippets of texts that users \
   has provided. It's a collective project where a users may submit inspiration \
   that together you take to form a story. It should be safe for work and children. \ 
-  Make sure you provide a full story, albeit short, 300 words. Make sure it is interesting. \
-  ALWAYS Split the story into three chapters. Make sure the story contains three chapters! \
+  Make sure you provide a full story, albeit short, minimum 500 words. Make sure it is interesting. \
+  ALWAYS Split the story into minimum three chapters, you may write more if you need to capture the user inputs well. \
+  Make sure the story contains minimum three chapters, max 6 chapters! \
   Use markdown to format the story. \
   THE OUTPUT SHOULD BE A JSON OBJECT WITH THE FOLLOWING FORMAT: \
   { \

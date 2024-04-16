@@ -18,7 +18,6 @@ const Story: NextPage = () => {
     contractName: "StoryKeeper",
     eventName: "InspirationSubmission",
     fromBlock: 0n,
-    enabled: eventHistory,
   });
 
   useEffect(() => {
@@ -81,7 +80,10 @@ const Story: NextPage = () => {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             {coverimage ? <img src={coverimage} alt="Cover" className="w-full rounded-lg" /> : ""}
           </div>
-          <Chapters chapters={storyData?.generatedStory.chapters.length ? storyData.generatedStory.chapters : []} />
+          <Chapters
+            showContribute
+            chapters={storyData?.generatedStory.chapters.length ? storyData.generatedStory.chapters : []}
+          />
         </div>
       </div>
     </>

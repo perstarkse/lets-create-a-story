@@ -2,7 +2,13 @@ import React, { useEffect, useState } from "react";
 import ContributeToStory from "./ContributeToStory";
 import Markdown from "react-markdown";
 
-export default function Chapters({ chapters }: { chapters: { chapter: number; content: string }[] }) {
+export default function Chapters({
+  chapters,
+  showContribute,
+}: {
+  chapters: { chapter: number; content: string }[];
+  showContribute: boolean;
+}) {
   const [currentPage, setCurrentPage] = useState(1);
   const [showContributeSection, setShowContributeSection] = useState(false);
   const itemsPerPage = 1;
@@ -110,7 +116,7 @@ export default function Chapters({ chapters }: { chapters: { chapter: number; co
           ))}
         </div>
       </div>
-      {showContributeSection && <ContributeToStory />}
+      {showContributeSection && showContribute && <ContributeToStory />}
     </div>
   );
 }
