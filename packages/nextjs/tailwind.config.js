@@ -3,30 +3,29 @@ module.exports = {
   content: ["./app/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}", "./utils/**/*.{js,ts,jsx,tsx}"],
   plugins: [require("daisyui")],
   darkTheme: "dark",
-  // DaisyUI theme colors
   daisyui: {
     themes: [
       {
         light: {
-          primary: "#93BBFB",
-          "primary-content": "#212638",
-          secondary: "#DAE8FF",
-          "secondary-content": "#212638",
-          accent: "#93BBFB",
-          "accent-content": "#212638",
-          neutral: "#212638",
-          "neutral-content": "#ffffff",
-          "base-100": "#ffffff",
-          "base-200": "#f4f8ff",
-          "base-300": "#DAE8FF",
-          "base-content": "#212638",
-          info: "#93BBFB",
-          success: "#34EEB6",
-          warning: "#FFCF72",
-          error: "#FF8863",
-
+          primary: "#BD93F9",
+          "primary-content": "#282A36",
+          secondary: "#BD93F9",
+          "secondary-content": "#282A36",
+          accent: "#FF79C6",
+          "accent-content": "#282A36",
+          neutral: "#282A36",
+          "neutral-content": "#F8F8F2",
+          "base-100": "#F8F8F2",
+          "base-200": "#EDF0F3",
+          "base-300": "#8BE9FD",
+          "base-content": "#282A36",
+          info: "#BD93F9",
+          success: "#50FA7B",
+          warning: "#FFB86C",
+          error: "#FF5555",
+    
           "--rounded-btn": "9999rem",
-
+    
           ".tooltip": {
             "--tooltip-tail": "6px",
           },
@@ -40,25 +39,25 @@ module.exports = {
       },
       {
         dark: {
-          primary: "#212638",
-          "primary-content": "#F9FBFF",
-          secondary: "#323f61",
-          "secondary-content": "#F9FBFF",
-          accent: "#4969A6",
-          "accent-content": "#F9FBFF",
-          neutral: "#F9FBFF",
-          "neutral-content": "#385183",
-          "base-100": "#385183",
-          "base-200": "#2A3655",
-          "base-300": "#212638",
-          "base-content": "#F9FBFF",
-          info: "#385183",
-          success: "#34EEB6",
-          warning: "#FFCF72",
-          error: "#FF8863",
-
+          primary: "#282A36",
+          "primary-content": "#F8F8F2",
+          secondary: "#44475A",
+          "secondary-content": "#F8F8F2",
+          accent: "#6272A4",
+          "accent-content": "#F8F8F2",
+          neutral: "#F8F8F2",
+          "neutral-content": "#6272A4",
+          "base-100": "#6272A4",
+          "base-200": "#3D4257",
+          "base-300": "#282A36",
+          "base-content": "#F8F8F2",
+          info: "#6272A4",
+          success: "#50FA7B",
+          warning: "#FFB86C",
+          error: "#FF5555",
+    
           "--rounded-btn": "9999rem",
-
+    
           ".tooltip": {
             "--tooltip-tail": "6px",
             "--tooltip-color": "oklch(var(--p))",
@@ -72,6 +71,7 @@ module.exports = {
         },
       },
     ],
+    
   },
   theme: {
     extend: {
