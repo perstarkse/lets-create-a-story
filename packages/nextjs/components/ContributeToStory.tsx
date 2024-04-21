@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import { useScaffoldContractWrite, useScaffoldEventHistory } from "~~/hooks/scaffold-eth";
 import { useGlobalState } from "~~/services/store/store";
 import { generateStoryBackend } from "~~/utils/api";
@@ -9,6 +10,7 @@ export default function ContributeToStory() {
   const [inputValue, setInputValue] = useState("");
   const [fetchEvents, setFetchEvents] = useState(false);
   const [effectExecuted, setEffectExecuted] = useState(false);
+  const [generationResult, setGenerationResult] = useState<boolean>(false);
 
   const { writeAsync, isLoading, isMining, isSuccess } = useScaffoldContractWrite({
     contractName: "StoryKeeper",
@@ -35,6 +37,7 @@ export default function ContributeToStory() {
     const result = await generateStoryBackend(story, timestamp);
     if (result) {
       setStoryData(result);
+      setGenerationResult(true);
     }
   };
 
@@ -85,7 +88,7 @@ export default function ContributeToStory() {
           </button>
         </>
       )}
-      {isSuccess && (
+      {isSuccess && !generationResult && (
         <div className="alert alert-success shadow-lg mt-4">
           <div className="flex gap-3">
             <svg
@@ -102,6 +105,29 @@ export default function ContributeToStory() {
               />
             </svg>
             <span>Your contribution has been submitted successfully and the story will now regenerate!</span>
+          </div>
+        </div>
+      )}
+      {generationResult && (
+        <div className="alert alert-success shadow-lg mt-4">
+          <div className="flex gap-3">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="stroke-current flex-shrink-0 h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span>The story has been successfully generated!</span>
+            <Link href="/story">
+              <a className="btn btn-primary">View Story</a>
+            </Link>
           </div>
         </div>
       )}
