@@ -57,7 +57,7 @@ export default function ContributeToStory() {
         generateStory(latestInspirationSubmission.story, latestInspirationSubmission.timestamp);
       }
     }
-  }, [isLoadingHistory, contractEvents, setEventHistory, generateStory, effectExecuted]);
+  }, [isLoadingHistory, contractEvents, setEventHistory, effectExecuted]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
