@@ -227,12 +227,21 @@ export async function POST(request: Request) {
 
     console.log("Image and Story object saved to Vercel");
 
-    return new Response(JSON.stringify({ story: storyData }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
+    return new Response(
+      JSON.stringify({
+        timestamp: timestamp,
+        generatedStory: storyData,
+        submittedStory: story,
+        image: blob.url,
+        imagePrompt: imagePrompt,
+      }),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    });
+    );
   } catch (error) {
     console.error("Error processing request:", error);
     return new Response(JSON.stringify({ message: "Error processing request" }), {

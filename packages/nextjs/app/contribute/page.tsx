@@ -17,7 +17,7 @@ const Contribute: NextPage = () => {
 
   return (
     <div className="flex flex-col items-center m-auto max-w-4xl mt-16">
-      <h1 className="text-4xl font-bold mb-8">Contribute</h1>
+      <h1 className="text-4xl font-bold mb-4">Contribute</h1>
       <p className="text-lg mb-4 px-6 text-center">
         So far {inspirationCount?.toString()} {inspirationCount?.toString() === "1" ? "user" : "users"} have contributed
         to the story.

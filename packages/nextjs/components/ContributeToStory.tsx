@@ -16,7 +16,7 @@ export default function ContributeToStory() {
     contractName: "StoryKeeper",
     functionName: "submitOrReplaceInspiration",
     args: [inputValue],
-    blockConfirmations: 1,
+    blockConfirmations: 2,
     onBlockConfirmation: () => {
       console.log("Block confirmation received");
       setFetchEvents(true);
@@ -44,7 +44,6 @@ export default function ContributeToStory() {
   useEffect(() => {
     if (!effectExecuted && !isLoadingHistory && contractEvents?.length) {
       setEffectExecuted(true);
-      console.log("contractEvents", contractEvents);
       setEventHistory(contractEvents);
 
       const latestInspirationSubmission = {
@@ -57,7 +56,7 @@ export default function ContributeToStory() {
         generateStory(latestInspirationSubmission.story, latestInspirationSubmission.timestamp);
       }
     }
-  }, [isLoadingHistory, contractEvents, setEventHistory, effectExecuted]);
+  }, [isLoadingHistory, contractEvents, setEventHistory, effectExecuted, generateStory]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
@@ -88,7 +87,7 @@ export default function ContributeToStory() {
           </button>
         </>
       )}
-      {isSuccess && !generationResult && (
+      {!isMining && isSuccess && !generationResult && (
         <div className="alert alert-success shadow-lg mt-4">
           <div className="flex gap-3">
             <svg
@@ -126,7 +125,7 @@ export default function ContributeToStory() {
             </svg>
             <span>The story has been successfully generated!</span>
             <Link href="/story">
-              <a className="btn btn-primary">View Story</a>
+              <div className="btn btn-primary">View Story</div>
             </Link>
           </div>
         </div>

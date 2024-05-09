@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { NextPage } from "next";
 import { Address } from "~~/components/scaffold-eth";
 import { useScaffoldEventHistory } from "~~/hooks/scaffold-eth";
 import { useGlobalState } from "~~/services/store/store";
+import { generateStoryBackend } from "~~/utils/api";
 
 const Timeline: NextPage = () => {
   const { eventHistory, setEventHistory } = useGlobalState();
+  const [coverImages, setCoverImages] = useState<[]>([]);
+  const [generationResult, setGenerationResult] = useState<boolean>(false);
 
   const { data: contractEvents, isLoading } = useScaffoldEventHistory({
     contractName: "StoryKeeper",
@@ -20,7 +23,22 @@ const Timeline: NextPage = () => {
     if (!eventHistory && !isLoading && contractEvents?.length) {
       setEventHistory(contractEvents);
     }
-  }, [isLoading, contractEvents, eventHistory, setEventHistory]);
+  }, [isLoading, contractEvents, eventHistory, setEventHistory, coverImages, setCoverImages]);
+  useEffect(() => {
+    const getCoverImages = async () => {
+      const response = await fetch("/api/getCoverImages");
+      const images = await response.json();
+      setCoverImages(images);
+    };
+    getCoverImages();
+  }, [generationResult]);
+
+  const generateStory = async (story: string, timestamp: number) => {
+    const result = await generateStoryBackend(story, timestamp);
+    if (result) {
+      setGenerationResult(true);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center m-auto max-w-6xl mt-16 px-6">
@@ -45,13 +63,39 @@ const Timeline: NextPage = () => {
                 <time className="font-mono italic">
                   {new Date(Number((event as any).block?.timestamp ?? 0) * 1000).toLocaleString()}
                 </time>
-                <div className={`text-lg font-black flex mt-2 ${index % 2 === 0 ? "justify-end" : "justify-start"}`}>
+                <div className={`text-lg font-black flex mt-2 ${index % 2 === 0 ? "justify-start" : "justify-start"}`}>
                   <Address address={event.args[0]} />
                 </div>
-                <div className="italic mt-2">{event.args[1]}</div>
-                <Link href={`/story/${event.block.timestamp}`}>
-                  <div className="underline text-accent mt-2">View the story at this time</div>
-                </Link>
+                {
+                  // @ts-ignore
+                  coverImages.find(image => image.pathname === `${event.block.timestamp}.png`) ? (
+                    </* eslint-disable-next-line @next/next/no-img-element */
+                    img
+                      // @ts-ignore
+                      src={coverImages.find(image => image.pathname === `${event.block.timestamp}.png`).url}
+                      className="w-3/4 mt-2"
+                    />
+                  ) : (
+                    <div className="w-1/2 mt-2 h-40 skeleton rounded"></div>
+                  )
+                }
+                <div className="italic mt-2">
+                  <strong>Submission:</strong> {event.args[1]}
+                </div>
+                {
+                  //@ts-ignore
+                  coverImages.find(image => image.pathname === `${event.block.timestamp}.png`) ? (
+                    <Link href={`/story/${event.block.timestamp}`}>
+                      <div className="underline text-accent mt-2">View the story at this time</div>
+                    </Link>
+                  ) : (
+                    <div className="underline text-accent mt-2">
+                      <div onClick={() => generateStory(event.args.story, event.block.timestamp.toString())}>
+                        Generate Story
+                      </div>
+                    </div>
+                  )
+                }
               </div>
               <hr />
             </li>

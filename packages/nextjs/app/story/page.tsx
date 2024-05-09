@@ -21,9 +21,6 @@ const Story: NextPage = () => {
   });
 
   useEffect(() => {
-    if (storyData || eventHistory) {
-      return;
-    }
     if (!isLoading && contractEvents?.length) {
       setEventHistory(contractEvents);
 
@@ -58,7 +55,7 @@ const Story: NextPage = () => {
     }
   }, [storyData, coverimage]);
 
-  if (!storyData) {
+  if (!storyData?.generatedStory?.chapters?.length) {
     return <></>;
   }
 
@@ -66,13 +63,10 @@ const Story: NextPage = () => {
     <>
       <div className="flex items-center flex-col flex-grow pt-10 max-w-5xl mx-auto">
         <div className="px-5">
-          <div className="flex justify-center">
-            {/* <button onClick={generateStory} className="btn btn-primary">
-              {" "}
-              Generate Story
-            </button> */}
-          </div>
-          <h1 className="text-4xl pt-4 text-center font-serif font-bold">{storyData?.generatedStory.title}</h1>
+          <div className="flex justify-center"></div>
+          <h1 className="text-4xl pt-4 text-center font-serif font-bold">
+            {storyData?.generatedStory.title ? storyData.generatedStory.title : "Placeholder"}
+          </h1>
           <h2 className="text-2xl py-2 text-center italic font-serif font-bold">
             {storyData?.generatedStory.subtitle}
           </h2>

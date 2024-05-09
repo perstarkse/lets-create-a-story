@@ -1,11 +1,14 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
-contract StoryKeeper {
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract StoryKeeper is Ownable {
 	string[] public inspirations;
 	mapping(address => uint256) public inspirationIndex;
 	mapping(address => bool) public hasSubmitted;
 	uint256 public inspirationCount;
+	mapping(address => bool) public whitelist;
 
 	event InspirationSubmission(
 		address indexed submitter,
@@ -13,7 +16,22 @@ contract StoryKeeper {
 		string story
 	);
 
+	function addWhitelist(address[] memory _users) public onlyOwner {
+		for (uint256 i = 0; i < _users.length; i++) {
+			whitelist[_users[i]] = true;
+		}
+	}
+	function removeWhitelist(address[] memory _users) public onlyOwner {
+		for (uint256 i = 0; i < _users.length; i++) {
+			whitelist[_users[i]] = false;
+		}
+	}
+
 	function submitOrReplaceInspiration(string memory _inspiration) public {
+		require(
+			whitelist[msg.sender],
+			"You are not allowed to submit inspirations"
+		);
 		uint256 index = inspirationIndex[msg.sender];
 		if (hasSubmitted[msg.sender]) {
 			inspirations[index] = _inspiration;

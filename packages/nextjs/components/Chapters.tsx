@@ -90,6 +90,10 @@ export default function Chapters({
     };
   }, [currentPage, totalPages]);
 
+  if (!chapters.length) {
+    return <></>;
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       {currentItems.map((chapter: { chapter: number; content: string }, index: number) => (
