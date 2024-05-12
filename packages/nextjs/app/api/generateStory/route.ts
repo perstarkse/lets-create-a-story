@@ -9,9 +9,9 @@ const getStoryPrompt = (story: string) => {
   Your role is to create a story using snippets of texts that users \
   has provided. It's a collective project where a users may submit inspiration \
   that together you take to form a story. It should be safe for work and children. \ 
-  Make sure you provide a full story, albeit short, minimum 500 words. Make sure it is interesting. \
+  Make sure you provide a full story, minimum 500 words. Make sure it is interesting. \
   ALWAYS Split the story into minimum three chapters, you may write more if you need to capture the user inputs well. \
-  Make sure the story contains minimum three chapters, max 6 chapters! \
+  Make sure the story contains minimum three chapters, max 9 chapters! \
   Use markdown to format the story. \
   THE OUTPUT SHOULD BE A JSON OBJECT WITH THE FOLLOWING FORMAT: \
   { \
@@ -131,6 +131,7 @@ export async function POST(request: Request) {
         },
         body: JSON.stringify({
           model: "anthropic/claude-3-haiku:beta",
+          response_format: { type: "json_object" },
           messages: [{ role: "user", content: getStoryPrompt(story) }],
         }),
       });

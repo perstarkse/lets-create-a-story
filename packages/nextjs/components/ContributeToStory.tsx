@@ -16,7 +16,7 @@ export default function ContributeToStory() {
     contractName: "StoryKeeper",
     functionName: "submitOrReplaceInspiration",
     args: [inputValue],
-    blockConfirmations: 2,
+    blockConfirmations: 1,
     onBlockConfirmation: () => {
       console.log("Block confirmation received");
       setFetchEvents(true);
@@ -30,18 +30,17 @@ export default function ContributeToStory() {
     enabled: fetchEvents,
   });
 
-  const { setEventHistory, setStoryData } = useGlobalState();
-
-  const generateStory = async (story: string, timestamp: number) => {
-    console.log("Generating story from latest inspiration submission");
-    const result = await generateStoryBackend(story, timestamp);
-    if (result) {
-      setStoryData(result);
-      setGenerationResult(true);
-    }
-  };
+  const { setEventHistory } = useGlobalState();
 
   useEffect(() => {
+    const generateStory = async (story: string, timestamp: number) => {
+      console.log("Generating story from latest inspiration submission");
+      const result = await generateStoryBackend(story, timestamp);
+      if (result) {
+        setGenerationResult(true);
+      }
+    };
+
     if (!effectExecuted && !isLoadingHistory && contractEvents?.length) {
       setEffectExecuted(true);
       setEventHistory(contractEvents);
@@ -56,7 +55,7 @@ export default function ContributeToStory() {
         generateStory(latestInspirationSubmission.story, latestInspirationSubmission.timestamp);
       }
     }
-  }, [isLoadingHistory, contractEvents, setEventHistory, effectExecuted, generateStory]);
+  }, [isLoadingHistory, contractEvents, setEventHistory, effectExecuted]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);

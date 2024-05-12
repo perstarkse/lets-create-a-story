@@ -25,7 +25,7 @@ const StoryPage = () => {
     }
   }, [storyData, coverimage]);
 
-  if (!storyData) {
+  if (!storyData?.generatedStory?.chapters?.length) {
     return <></>;
   }
 
