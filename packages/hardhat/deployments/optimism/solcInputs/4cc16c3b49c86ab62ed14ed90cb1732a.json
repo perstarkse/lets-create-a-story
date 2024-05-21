@@ -1,0 +1,41 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "@openzeppelin/contracts/access/Ownable.sol": {
+      "content": "// SPDX-License-Identifier: MIT\n// OpenZeppelin Contracts (last updated v4.7.0) (access/Ownable.sol)\n\npragma solidity ^0.8.0;\n\nimport \"../utils/Context.sol\";\n\n/**\n * @dev Contract module which provides a basic access control mechanism, where\n * there is an account (an owner) that can be granted exclusive access to\n * specific functions.\n *\n * By default, the owner account will be the one that deploys the contract. This\n * can later be changed with {transferOwnership}.\n *\n * This module is used through inheritance. It will make available the modifier\n * `onlyOwner`, which can be applied to your functions to restrict their use to\n * the owner.\n */\nabstract contract Ownable is Context {\n    address private _owner;\n\n    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);\n\n    /**\n     * @dev Initializes the contract setting the deployer as the initial owner.\n     */\n    constructor() {\n        _transferOwnership(_msgSender());\n    }\n\n    /**\n     * @dev Throws if called by any account other than the owner.\n     */\n    modifier onlyOwner() {\n        _checkOwner();\n        _;\n    }\n\n    /**\n     * @dev Returns the address of the current owner.\n     */\n    function owner() public view virtual returns (address) {\n        return _owner;\n    }\n\n    /**\n     * @dev Throws if the sender is not the owner.\n     */\n    function _checkOwner() internal view virtual {\n        require(owner() == _msgSender(), \"Ownable: caller is not the owner\");\n    }\n\n    /**\n     * @dev Leaves the contract without owner. It will not be possible to call\n     * `onlyOwner` functions anymore. Can only be called by the current owner.\n     *\n     * NOTE: Renouncing ownership will leave the contract without an owner,\n     * thereby removing any functionality that is only available to the owner.\n     */\n    function renounceOwnership() public virtual onlyOwner {\n        _transferOwnership(address(0));\n    }\n\n    /**\n     * @dev Transfers ownership of the contract to a new account (`newOwner`).\n     * Can only be called by the current owner.\n     */\n    function transferOwnership(address newOwner) public virtual onlyOwner {\n        require(newOwner != address(0), \"Ownable: new owner is the zero address\");\n        _transferOwnership(newOwner);\n    }\n\n    /**\n     * @dev Transfers ownership of the contract to a new account (`newOwner`).\n     * Internal function without access restriction.\n     */\n    function _transferOwnership(address newOwner) internal virtual {\n        address oldOwner = _owner;\n        _owner = newOwner;\n        emit OwnershipTransferred(oldOwner, newOwner);\n    }\n}\n"
+    },
+    "@openzeppelin/contracts/utils/Context.sol": {
+      "content": "// SPDX-License-Identifier: MIT\n// OpenZeppelin Contracts v4.4.1 (utils/Context.sol)\n\npragma solidity ^0.8.0;\n\n/**\n * @dev Provides information about the current execution context, including the\n * sender of the transaction and its data. While these are generally available\n * via msg.sender and msg.data, they should not be accessed in such a direct\n * manner, since when dealing with meta-transactions the account sending and\n * paying for execution may not be the actual sender (as far as an application\n * is concerned).\n *\n * This contract is only required for intermediate, library-like contracts.\n */\nabstract contract Context {\n    function _msgSender() internal view virtual returns (address) {\n        return msg.sender;\n    }\n\n    function _msgData() internal view virtual returns (bytes calldata) {\n        return msg.data;\n    }\n}\n"
+    },
+    "contracts/StoryKeeper.sol": {
+      "content": "//SPDX-License-Identifier: MIT\npragma solidity >=0.8.0 <0.9.0;\n\nimport \"@openzeppelin/contracts/access/Ownable.sol\";\n\ncontract StoryKeeper is Ownable {\n\tstring[] public inspirations;\n\tmapping(address => uint256) public inspirationIndex;\n\tmapping(address => bool) public hasSubmitted;\n\tuint256 public inspirationCount;\n\tmapping(address => bool) public whitelist;\n\n\tevent InspirationSubmission(\n\t\taddress indexed submitter,\n\t\tstring inspiration,\n\t\tstring story\n\t);\n\n\tfunction addWhitelist(address[] memory _users) public onlyOwner {\n\t\tfor (uint256 i = 0; i < _users.length; i++) {\n\t\t\twhitelist[_users[i]] = true;\n\t\t}\n\t}\n\tfunction removeWhitelist(address[] memory _users) public onlyOwner {\n\t\tfor (uint256 i = 0; i < _users.length; i++) {\n\t\t\twhitelist[_users[i]] = false;\n\t\t}\n\t}\n\n\tfunction submitOrReplaceInspiration(string memory _inspiration) public {\n\t\trequire(\n\t\t\twhitelist[msg.sender],\n\t\t\t\"You are not allowed to submit inspirations\"\n\t\t);\n\t\tuint256 index = inspirationIndex[msg.sender];\n\t\tif (hasSubmitted[msg.sender]) {\n\t\t\tinspirations[index] = _inspiration;\n\t\t\temit InspirationSubmission(msg.sender, _inspiration, getStory());\n\t\t} else {\n\t\t\tinspirationCount++;\n\t\t\tinspirations.push(_inspiration);\n\t\t\tinspirationIndex[msg.sender] = inspirations.length - 1;\n\t\t\thasSubmitted[msg.sender] = true;\n\t\t\temit InspirationSubmission(msg.sender, _inspiration, getStory());\n\t\t}\n\t}\n\n\tfunction getStory() public view returns (string memory) {\n\t\tstring memory story = \"\";\n\t\tfor (uint256 i = 0; i < inspirations.length; i++) {\n\t\t\tif (i > 0) {\n\t\t\t\tstory = string(abi.encodePacked(story, \" \", inspirations[i]));\n\t\t\t} else {\n\t\t\t\tstory = string(abi.encodePacked(story, inspirations[i]));\n\t\t\t}\n\t\t}\n\t\treturn story;\n\t}\n}\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}
