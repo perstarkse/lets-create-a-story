@@ -3,6 +3,7 @@ import { put } from "@vercel/blob";
 import { kv } from "@vercel/kv";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 const getStoryPrompt = (story: string) => {
   const prompt = `
